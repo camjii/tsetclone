@@ -35,5 +35,9 @@
     "evaluation_strategy": "steps",
     "eval_steps": 64,
     "predict_with_generate": true,
-    "use_relation": false
+    "use_relation": false,
+
+    "source_column": "input_process",
+    "target_column": "target_process"
+
 }
