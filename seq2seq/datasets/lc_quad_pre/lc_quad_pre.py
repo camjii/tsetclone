@@ -31,14 +31,10 @@ class LcQuad(datasets.GeneratorBasedBuilder):
     VERSION = datasets.Version("2.0.0")
 
     def _info(self):
-        # TODO(lc_quad): Specifies the datasets.DatasetInfo object
         return datasets.DatasetInfo(
-            # This is the description that will appear on the datasets page.
             description=_DESCRIPTION,
-            # datasets.features.FeatureConnectors
             features=datasets.Features(
                 {
-                    # 'uid': datasets.Value("string"),
                     'input_process': datasets.Value("string"),
                     'target_process': datasets.Value("string")
                 }
@@ -49,8 +45,6 @@ class LcQuad(datasets.GeneratorBasedBuilder):
         )
 
     def _split_generators(self, dl_manager):
-        """Returns SplitGenerators."""
-        # dl_dir = dl_manager.download_and_extract(_URL)
         dl_dir = './transform/transformers_cache/downloads'
         dl_dir = os.path.join(dl_dir, "LC-QuAD2.0-pre", "dataset")
         return [
@@ -71,7 +65,6 @@ class LcQuad(datasets.GeneratorBasedBuilder):
 
             for id_, row in enumerate(data):
                 yield id_, {
-                    # 'uid': row['uid'],
-                    'input_process': row['input'],
-                    'target_process': row['target']
+                    "input_process": str(row.get("input") or row.get("question") or ""),
+                    "target_process": str(row.get("target") or row.get("sparql_query") or "")
                 }
