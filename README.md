@@ -40,7 +40,7 @@ Replace `"model_name_or_path"` with the model name (`t5-small`, `t5-base`, or `t
 You can simply run the code below:
 
 ```
-CUDA_VISIBLE_DEVICES=0 python seq2seq/run_seq2seq.py configs/train_1.json
+python seq2seq/run_seq2seq.py configs/train_1.json
 ```
 
 ## Fine-tuning
@@ -52,6 +52,7 @@ You should replace `"dataset"` with the name of the dataset that your want to fi
 You can simply run the code below:
 
 ```
-CUDA_VISIBLE_DEVICES=0 python seq2seq/run_seq2seq.py configs/train_2.json
+python seq2seq/run_seq2seq.py configs/train_2.json
 ```
+
 
