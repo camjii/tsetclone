@@ -106,9 +106,38 @@ class QuadPreTrainer(Seq2SeqTrainer):
         inputs = self.tokenizer.batch_decode([f["input_ids"] for f in features], skip_special_tokens=False)
         label_ids = [f["labels"] for f in features]
 
+        # Clean and standardize label_ids regardless of ignore_pad_token_for_loss setting
+        cleaned = []
+        for seq in label_ids:
+            # Handle empty sequences
+            if not seq or len(seq) == 0:
+                cleaned.append([self.tokenizer.pad_token_id])
+                continue
+            
+            # Flatten if nested
+            if isinstance(seq, (list, tuple)) and len(seq) > 0 and isinstance(seq[0], (list, tuple)):
+                seq = [item for sublist in seq for item in sublist]
+            
+            # Convert to list if numpy array
+            if isinstance(seq, np.ndarray):
+                seq = seq.tolist()
+            
+            cleaned.append(seq)
+
+        # Pad to same length
+        max_len = max(len(s) for s in cleaned)
+        label_ids_padded = np.full((len(cleaned), max_len), self.tokenizer.pad_token_id, dtype=np.int64)
+
+        for i, seq in enumerate(cleaned):
+            label_ids_padded[i, :len(seq)] = seq
+
+        # Now apply the transformation based on the flag
         if self.ignore_pad_token_for_loss:
-            # Replace -100 in the labels as we can't decode them.
-            _label_ids = np.where(label_ids != -100, label_ids, self.tokenizer.pad_token_id)
+            # Replace -100 in the labels as we can't decode them
+            _label_ids = np.where(label_ids_padded != -100, label_ids_padded, self.tokenizer.pad_token_id)
+        else:
+            _label_ids = label_ids_padded
+            
         decoded_label_ids = self.tokenizer.batch_decode(_label_ids, skip_special_tokens=False)
         metas = [
             {
